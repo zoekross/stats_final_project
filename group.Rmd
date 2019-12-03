@@ -1,0 +1,50 @@
+---
+title: "data_explore.rmd"
+output: html_document:
+  keep_md: yes
+---
+
+```{r setup, include=FALSE}
+library(fivethirtyeight) 
+library(ggplot2)
+library(ggridges)
+```
+
+
+
+```{r}
+bachelorette_data <- bachelorette
+drug_use <- drug_use
+
+```
+
+```{r}
+ggplot(data = bachelorette_data) +
+    geom_bar(mapping = (aes(x = season, fill = factor(show), postion = "fill")))+
+  facet_wrap(~show)
+```
+There are more seasons of the Bachelor than the Bachelorette.
+
+
+```{r}
+ggplot(data = bachelorette_data) +
+    geom_density_ridges(aes(x = dates_2, y = show, fill = "show"), alpha=.5)
+```
+
+```{r}
+ggplot(data = drug_use) +
+    geom_point(aes(x = age, y = alcohol_use))
+```
+There is an increase of alcohol use beginning the late teens which continues until the age of 21-23. Alcohol use then beings to decrease as age increases.
+
+```{r}
+ggplot(data = drug_use) +
+    geom_point(aes(x = age, y = heroin_use))
+```
+Heroin use is low among young teens and adults over 35. It is highest for people in their early 20's. 
+
+```{r}
+ggplot(data = drug_use) +
+    geom_density(aes(x = heroin_freq), fill = "lightblue",)
+```
+
