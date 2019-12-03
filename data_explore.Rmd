@@ -13,24 +13,10 @@ library(ggridges)
 
 
 ```{r}
-bachelorette_data <- bachelorette
 drug_use <- drug_use
 
 ```
 
-```{r}
-ggplot(data = bachelorette_data) +
-    geom_bar(mapping = (aes(x = season, fill = factor(show), postion = "fill")))+
-  facet_wrap(~show)
-```
-There are 8 more seasons of the Bachelor than the Bachelorette.
-
-```{r}
-ggplot(data = bachelorette_data) +
-    geom_density_ridges(aes(x = dates_2, y = show, fill = "show"), alpha=.5)+
-  xlab("Number of dates during week 2")
-```
-Contestants on the Bachelorette go on more dates during week 2 than contestants on the Bachelor. 
 
 ```{r}
 ggplot(data = drug_use) +
