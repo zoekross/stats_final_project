@@ -24,7 +24,6 @@ Question: We will work to examine how the frequencies of specific variables in h
 bob_ross <- bob_ross
 ```
 
-
 ```{r}
 ggplot(data = bob_ross) +
     geom_histogram(aes(x = tree), fill = "lightblue", color= "white", bins = 30)
@@ -38,6 +37,31 @@ ggplot(data = bob_ross) +
 Only a small number of Bob Ross's painting contain a beach 
 
 ```{r}
+ggplot(bob_ross)+
+  geom_jitter(aes(x=season, y= factor(lake), color= factor(clouds)))+
+  facet_wrap(~lake)
+```
+
+```{r}
+glm_tree <- glm(tree ~ apple_frame,
+                 data= bob_ross, family=binomial)
+tidy(glm_tree)
+```
+There are trees in 89.6% of Bob Ross's paintings. An apple in the painting corresponds to a 10.4 pecent increase that there will also be a tree, which add to 100% so when there is an apple there is a tree in his painting on average. We chose to fit this model because tree frequently appear in his works and apple often are associated with trees. 
+
+In the context of our research question an apple in the painting increases the likelihood of tree in the same painting to 100% on average. 
+
+
+```{r}
+glm_tree <- glm(palm_trees ~ beach + waves,
+                 data= bob_ross, family=binomial)
+tidy(glm_tree)
+```
+There are palm trees alone in none of his paintings. When a beach appears it corresponds to a 1.7% increase in likelihood that a palm tree will also be in the painting on average. On average, when waves appear it corresponds to a 25.2% increase in likelihood that a palm tree will also be in the painting. We chose to fit this model because palm trees, waves and a beach often appear together. 
+
+In the context of our research question, having waves and a beach increases the appearance of a palm by 26.9% on average.
+
+```{r}
 glm_lake <- glm(lake ~ clouds,
                  data = bob_ross, family = binomial)
 tidy(glm_lake) %>% 
@@ -45,13 +69,6 @@ select(term, estimate) %>%
   mutate(exp_est = exp(estimate))
 ```
 On average, 36.2% of Bob Ross's paintings have a lake. However, the presence of clouds reduces the percentage by 1.5. 
-
-```{r}
-ggplot(bob_ross)+
-  geom_jitter(aes(x=season, y= factor(lake), color= factor(clouds)))+
-  facet_wrap(~lake)
-```
-
 
 ```{r}
 set.seed(1129)
@@ -91,23 +108,5 @@ bootstrap_bob_ross%>%
          upperSE = estimated_coeff + 2*sd(estimate))
 ```
 
-```{r}
-glm_tree <- glm(tree ~ apple_frame,
-                 data= bob_ross, family=binomial)
-tidy(glm_tree)
-```
-There are trees in 89.6% of Bob Ross's paintings. An apple in the painting corresponds to a 10.4 pecent increase that there will also be a tree, which add to 100% so when there is an apple there is a tree in his painting on average. We chose to fit this model because tree frequently appear in his works and apple often are associated with trees. 
 
-In the context of our research question an apple in the painting increases the likelihood of tree in the same painting to 100% on average. 
-
-
-```{r}
-glm_tree <- glm(palm_trees ~ beach + waves,
-                 data= bob_ross, family=binomial)
-tidy(glm_tree)
-```
-There are palm trees alone in none of his paintings. When a beach appears it corresponds to a 1.7% increase in likelihood that a palm tree will also be in the painting on average. On average, when waves appear it corresponds to a 25.2% increase in likelihood that a palm tree will also be in the painting. We chose to fit this model because palm trees, waves and a beach often appear together. 
-
-In the context of our research question, having waves and a beach increases the appearance of a palm by 26.9% on average.
-
-Our next steps 
+Next research steps: 
