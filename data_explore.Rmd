@@ -18,7 +18,12 @@ Describing Data and Research Question:
 
 Our data is an analysis of Bob Ross's paintings that show when certain elements of nature such as trees or waves appear in his work. This dataset comes from the fivethirtyeight package in R studio and it was collected by counting the number of certain objects in 403 of his paintings. We hope to learn more about how specific elements in his paintings influence what other objects will appear in that same artwork.
 
-Question: We will work to examine how the frequencies of specific variables affect the likelihood of other elements appearing in his works. 
+Question: We will work to examine how the frequencies of specific variables in his paintings affect the likelihood of other elements appearing in his works. 
+
+```{r}
+bob_ross <- bob_ross
+```
+
 
 ```{r}
 ggplot(data = bob_ross) +
@@ -33,15 +38,76 @@ ggplot(data = bob_ross) +
 Only a small number of Bob Ross's painting contain a beach 
 
 ```{r}
-lm_tree <- lm(tree ~ apple_frame,
-                 data= bob_ross)
-get_regression_table(lm_tree)
+glm_lake <- glm(lake ~ clouds,
+                 data = bob_ross, family = binomial)
+tidy(glm_lake) %>% 
+select(term, estimate) %>% 
+  mutate(exp_est = exp(estimate))
+```
+On average, 36.2% of Bob Ross's paintings have a lake. However, the presence of clouds reduces the percentage by 1.5. 
+
+```{r}
+ggplot(bob_ross)+
+  geom_jitter(aes(x=season, y= factor(lake), color= factor(clouds)))+
+  facet_wrap(~lake)
 ```
 
 
 ```{r}
-lm_tree <- lm(palm_trees ~ beach + waves,
-                 data= bob_ross)
-get_regression_table(lm_tree)
+set.seed(1129)
+
+bootstrap_bob_ross <- 
+  rep_sample_n(bob_ross, #this is the original dataset
+               size = 403,  #size of the original sample
+               reps = 200,  #how many times we repeat this sample
+               replace = TRUE)%>% #codes for replacement
+  group_by(replicate) %>% #groups each rep together    
+  do(glm(lake ~ clouds, data=.) %>% tidy()) %>% 
+  select(term, estimate) %>% 
+  mutate(exp_est = exp(estimate))
+  
 ```
 
+```{r}
+
+bootstrap_bob_ross %>% 
+  ggplot(aes(x = estimate)) +
+  geom_histogram(bins=20)
+
+
+bootstrap_bob_ross %>%
+  summarize(mean_est = mean(estimate),
+            se_est = sd(estimate))
+```
+This is a histogram showing the bootstrap distribution of the average likelihood that a lake is in the painting. The mean is 16.9% and SD is 19.8%.
+
+```{r}
+estimated_coeff <- tidy(lm_lake)%>%
+  pull(estimate)
+
+bootstrap_bob_ross%>%
+  ungroup()%>%
+  summarize(lowerSE = estimated_coeff - 2*sd(estimate),
+         upperSE = estimated_coeff + 2*sd(estimate))
+```
+
+```{r}
+glm_tree <- glm(tree ~ apple_frame,
+                 data= bob_ross, family=binomial)
+tidy(glm_tree)
+```
+There are trees in 89.6% of Bob Ross's paintings. An apple in the painting corresponds to a 10.4 pecent increase that there will also be a tree, which add to 100% so when there is an apple there is a tree in his painting on average. We chose to fit this model because tree frequently appear in his works and apple often are associated with trees. 
+
+In the context of our research question an apple in the painting increases the likelihood of tree in the same painting to 100% on average. 
+
+
+```{r}
+glm_tree <- glm(palm_trees ~ beach + waves,
+                 data= bob_ross, family=binomial)
+tidy(glm_tree)
+```
+There are palm trees alone in none of his paintings. When a beach appears it corresponds to a 1.7% increase in likelihood that a palm tree will also be in the painting on average. On average, when waves appear it corresponds to a 25.2% increase in likelihood that a palm tree will also be in the painting. We chose to fit this model because palm trees, waves and a beach often appear together. 
+
+In the context of our research question, having waves and a beach increases the appearance of a palm by 26.9% on average.
+
+Our next steps 
