@@ -14,42 +14,11 @@ library(broom)
 library(moderndive)
 ```
 
+Describing Data and Research Question:
 
-```{r}
-drug_use <- drug_use
-```
+Our data is an analysis of Bob Ross's paintings that show when certain elements of nature such as trees or waves appear in his work. This dataset comes from the fivethirtyeight package in R studio and it was collected by counting the number of certain objects in 403 of his paintings. We hope to learn more about how specific elements in his paintings influence what other objects will appear in that same artwork.
 
-
-```{r}
-ggplot(data = drug_use) +
-    geom_point(aes(x = age, y = alcohol_use))
-```
-There is an increase in alcohol use beginning in the late teens which continues until the age of 21-23. After age 23, alcohol use then beings to decrease as age increases.
-
-```{r}
-ggplot(data = drug_use) +
-    geom_point(aes(x = age, y = heroin_use))
-```
-Heroin use is low among young teens and adults over 35. It is highest for people in their early 20's.
-
-```{r}
-ggplot(data = drug_use) +
-    geom_histogram(aes(x = heroin_freq), fill = "lightblue", color= "white", bins = 30)+
-  xlab("Heroin Frequency")
-```
-Most heroin users have used the drug between 25-75 times and only a small number have used heroin more than 100 times. 
-
-```{r}
-lm_alcohol <- lm(alcohol_use ~ age,
-                 data=drug_use)
-get_regression_table(lm_alcohol)
-```
-
-```{r}
-lm_drug <- lm(alcohol_use ~ marijuana_use,
-                 data=drug_use)
-get_regression_table(lm_drug)
-```
+Question: We will work to examine how the frequencies of specific variables affect the likelihood of other elements appearing in his works. 
 
 ```{r}
 ggplot(data = bob_ross) +
@@ -71,7 +40,7 @@ get_regression_table(lm_tree)
 
 
 ```{r}
-lm_tree <- lm(palm_trees ~ beach,
+lm_tree <- lm(palm_trees ~ beach + waves,
                  data= bob_ross)
 get_regression_table(lm_tree)
 ```
