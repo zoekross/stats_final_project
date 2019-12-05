@@ -9,12 +9,14 @@ Names: Natalie, Zoe, and Aiym
 library(fivethirtyeight) 
 library(ggplot2)
 library(ggridges)
+library(tidyverse)
+library(broom)
+library(moderndive)
 ```
 
 
 ```{r}
 drug_use <- drug_use
-
 ```
 
 
@@ -36,3 +38,41 @@ ggplot(data = drug_use) +
   xlab("Heroin Frequency")
 ```
 Most heroin users have used the drug between 25-75 times and only a small number have used heroin more than 100 times. 
+
+```{r}
+lm_alcohol <- lm(alcohol_use ~ age,
+                 data=drug_use)
+get_regression_table(lm_alcohol)
+```
+
+```{r}
+lm_drug <- lm(alcohol_use ~ marijuana_use,
+                 data=drug_use)
+get_regression_table(lm_drug)
+```
+
+```{r}
+ggplot(data = bob_ross) +
+    geom_histogram(aes(x = tree), fill = "lightblue", color= "white", bins = 30)
+```
+The vast majority of Bob Ross's painting have trees in them 
+
+```{r}
+ggplot(data = bob_ross) +
+    geom_histogram(aes(x = beach), fill = "lightblue", color= "white", bins = 30)
+```
+Only a small number of Bob Ross's painting contain a beach 
+
+```{r}
+lm_tree <- lm(tree ~ apple_frame,
+                 data= bob_ross)
+get_regression_table(lm_tree)
+```
+
+
+```{r}
+lm_tree <- lm(palm_trees ~ beach,
+                 data= bob_ross)
+get_regression_table(lm_tree)
+```
+
