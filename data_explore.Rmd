@@ -110,3 +110,5 @@ bootstrap_bob_ross%>%
 
 
 Next research steps: 
+
+Would could find and evalute statistics for our models and graphs such as mean, standard usings bootstrapping but we could also create a hypothesis and test it to predict if there is a relationship between certain object in Bob Ross's paintings.
