@@ -31,6 +31,13 @@ ggplot(data = bob_ross) +
 The vast majority of Bob Ross's painting have trees in them 
 
 ```{r}
+ggplot(data=bob_ross) +
+  geom_bar(mapping = aes(x=tree, fill=factor(lake))) 
+
+```
+
+
+```{r}
 ggplot(data = bob_ross) +
     geom_histogram(aes(x = beach), fill = "lightblue", color= "white", bins = 30)
 ```
@@ -43,7 +50,7 @@ ggplot(bob_ross)+
 ```
 
 ```{r}
-glm_tree <- glm(tree ~ apple_frame,
+glm_tree <- glm(tree ~ lake,
                  data= bob_ross, family=binomial)
 tidy(glm_tree)
 ```
@@ -53,7 +60,7 @@ In the context of our research question an apple in the painting increases the l
 
 
 ```{r}
-glm_tree <- glm(palm_trees ~ beach + waves,
+glm_tree <- glm(tree ~ lake + rocks,
                  data= bob_ross, family=binomial)
 tidy(glm_tree)
 ```
