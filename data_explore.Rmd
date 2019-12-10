@@ -16,7 +16,7 @@ library(moderndive)
 
 Describing Data and Research Question:
 
-Our data is an analysis of Bob Ross's paintings that show when certain elements of nature such as trees or waves appear in his work. This dataset comes from the fivethirtyeight package in R studio and it was collected by counting the number of certain objects in 403 of his paintings. We hope to learn more about how specific elements in his paintings influence what other objects will appear in that same artwork.
+Our data is an analysis of Bob Ross's paintings that show when certain elements of nature such as trees or waves appear in his work. This dataset comes from the fivethirtyeight package in R studio and it was collected by counting the number of certain objects in 403 of his paintings. We hope to learn more about how specific elements in his paintings influence the likelihood that a tree will appear in that same artwork.
 
 Question: We will work to examine how the frequencies of specific variables in his paintings affect the likelihood of other elements appearing in his works. 
 
@@ -30,18 +30,11 @@ ggplot(data = bob_ross) +
 ```
 The vast majority of Bob Ross's painting have trees in them 
 
+
 ```{r}
 ggplot(data = bob_ross) +
-    geom_histogram(aes(x = lake), fill = "lightblue", color= "white", bins = 30)
+    geom_histogram(aes(x = snow), fill = "lightblue", color= "white", bins = 10)
 ```
-Only a small number of Bob Ross's painting contain a beach 
-
-
-```{r}
-ggplot(data=bob_ross) +
-  geom_bar(mapping = aes(x=tree, fill=factor(lake))) 
-```
-
 
 
 ```{r}
@@ -49,53 +42,68 @@ ggplot(bob_ross)+
   geom_jitter(aes(x=season, y= factor(tree), color= factor(lake)))+
   facet_wrap(~tree)
 ```
+If there is a lake in one of his paintings it is very likely that there will also be a tree because There is only one of his paintings that has a lake and no trees. 
+```{r}
+ggplot(data=bob_ross) +
+  geom_bar(mapping = aes(x=tree, fill=factor(lake))) 
+```
+
 
 ```{r}
 glm_tree <- glm(tree ~ lake,
-                 data= bob_ross, family=binomial)
+                  data= bob_ross, family=binomial)
 tidy(glm_tree)
 ```
-There are trees in 89.6% of Bob Ross's paintings. An apple in the painting corresponds to a 10.4 pecent increase that there will also be a tree, which add to 100% so when there is an apple there is a tree in his painting on average. We chose to fit this model because tree frequently appear in his works and apple often are associated with trees. 
-
-In the context of our research question an apple in the painting increases the likelihood of tree in the same painting to 100% on average. 
-
-
 ```{r}
-glm_tree <- glm(tree ~ lake + rocks,
-                 data= bob_ross, family=binomial)
-tidy(glm_tree)
-```
-There are palm trees alone in none of his paintings. When a beach appears it corresponds to a 1.7% increase in likelihood that a palm tree will also be in the painting on average. On average, when waves appear it corresponds to a 25.2% increase in likelihood that a palm tree will also be in the painting. We chose to fit this model because palm trees, waves and a beach often appear together. 
-
-In the context of our research question, having waves and a beach increases the appearance of a palm by 26.9% on average.
-
-```{r}
-glm_lake <- glm(lake ~ clouds,
-                 data = bob_ross, family = binomial)
-tidy(glm_lake) %>% 
-select(term, estimate) %>% 
-  mutate(exp_est = exp(estimate))
-```
-On average, 36.2% of Bob Ross's paintings have a lake. However, the presence of clouds reduces the percentage by 1.5. 
-
-```{r}
-set.seed(1129)
-
-bootstrap_bob_ross <- 
-  rep_sample_n(bob_ross, #this is the original dataset
-               size = 403,  #size of the original sample
-               reps = 200,  #how many times we repeat this sample
-               replace = TRUE)%>% #codes for replacement
-  group_by(replicate) %>% #groups each rep together    
-  do(glm(lake ~ clouds, data=.) %>% tidy()) %>% 
+tidy(glm_tree) %>% 
   select(term, estimate) %>% 
   mutate(exp_est = exp(estimate))
-  
+```
+
+On average, the presence of a lake in a painting increases the odds of having a tree in the painting by 26.584474. This makes sense and is in accordance with what we expected from the graph above. There is only one lake in all of his paintings, which doesn't have a tree paired with it. We chose to fit this model because our graph of tree and lake had an interesting relationship that we wanted to investigate further.
+
+
+```{r}
+glm_cloud <- glm(tree ~ lake+clouds,
+                  data= bob_ross, family=binomial)
+tidy(glm_cloud)
+```
+```{r}
+tidy(glm_cloud) %>% 
+  select(term, estimate) %>% 
+  mutate(exp_est = exp(estimate))
+```
+We chose to produce this model because we wanted to see if adding an extra independent variable is going to change the relationship between lake and tree. By adding the additional independent variable, the odds for the lake coefficient increase to 28.21, on average. The presence of clouds in a painting increases the odds of a tree being present in the painting by 0.20, on average.  
+
+```{r}
+set.seed(11)
+
+bootstrap_bob_ross <- 
+  rep_sample_n(bob_ross, 
+               size = 403,
+               reps = 200,  
+               replace = TRUE)%>% 
+  group_by(replicate) %>%
+  do(glm(tree ~ lake + clouds, data=.) %>% tidy()) %>% 
+  mutate(exp_est = exp(estimate)) %>%
+   select(term == "exp_estimate") %>% 
+  ungroup()
+
+```
+```{r}
+set.seed(111)
+boot_ross <-
+  bob_ross %>% 
+  rep_sample_n(size = 403, replace = TRUE, reps = 200) %>% 
+  group_by(replicate) %>% 
+  do(glm(tree ~ lake, data=.) %>% tidy()) %>%
+  filter(term == "lake")
+
 ```
 
 ```{r}
 
-bootstrap_bob_ross %>% 
+boot_ross %>% 
   ggplot(aes(x = estimate)) +
   geom_histogram(bins=20)
 
@@ -107,16 +115,18 @@ bootstrap_bob_ross %>%
 This is a histogram showing the bootstrap distribution of the average likelihood that a lake is in the painting. The mean is 16.9% and SD is 19.8%.
 
 ```{r}
-estimated_coeff <- tidy(lm_lake)%>%
+estimated_coeff <- tidy(glm_tree)%>%
   pull(estimate)
 
 bootstrap_bob_ross%>%
-  ungroup()%>%
-  summarize(lowerSE = estimated_coeff - 2*sd(estimate),
-         upperSE = estimated_coeff + 2*sd(estimate))
+  summarise(
+    se= sd(estimate),
+    lower_q = 1.675500	 - 2*se,
+    upper_q = 1.675500	 + 2*se)
+      
 ```
 
 
 Next research steps: 
 
-Would could find and evalute statistics for our models and graphs such as mean, standard usings bootstrapping but we could also create a hypothesis and test it to predict if there is a relationship between certain object in Bob Ross's paintings.
+Would could find and evalute statistics for our models and graphs such as mean and standard deviation. We used bootstrapping in this assignment but we could also conduct a hypothesis and test it to predict if there is a relationship between certain object in Bob Ross's paintings.
