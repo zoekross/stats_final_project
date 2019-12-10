@@ -30,6 +30,10 @@ ggplot(data = bob_ross) +
 ```
 The vast majority of Bob Ross's painting have trees in them 
 
+```{r}
+ggplot(data = bob_ross) +
+    geom_histogram(aes(x = lake), fill = "lightblue", color= "white", bins = 10)
+```
 
 ```{r}
 ggplot(data = bob_ross) +
@@ -45,7 +49,7 @@ ggplot(bob_ross)+
 If there is a lake in one of his paintings it is very likely that there will also be a tree because There is only one of his paintings that has a lake and no trees. 
 ```{r}
 ggplot(data=bob_ross) +
-  geom_bar(mapping = aes(x=tree, fill=factor(lake))) 
+  geom_bar(mapping = aes(x=tree, fill=factor(lake)), position = "fill")
 ```
 
 
@@ -81,7 +85,7 @@ boot_ross <-
   bob_ross %>% 
   rep_sample_n(size = 403, replace = TRUE, reps = 200) %>% 
   group_by(replicate) %>% 
-  do(glm(tree ~ lake, data=.) %>% tidy()) %>%
+  do(glm(tree ~ lake, data=., family=binomial) %>% tidy()) %>%
   filter(term == "lake")
 
 boot_ross %>% 
@@ -93,8 +97,7 @@ boot_ross %>%
             se_est = sd(estimate))
 ```
 
-This is a histogram showing the bootstrap distribution of the average likelihood that a lake is in the painting. The mean is 16.9% and SD is 19.8%.
-
+This is a histogram showing the bootstrap distribution of the average likelihood that a lake is in the painting. There is only one painting with a tree and no lake, which caused the bootstrapping distribution to split because in some cases that one painting was not selected during sampling. 
 
 
 ```{r}
@@ -112,4 +115,4 @@ bootstrap_bob_ross%>%
 
 Next research steps: 
 
-Would could find and evalute statistics for our models and graphs such as mean and standard deviation. We used bootstrapping in this assignment but we could also conduct a hypothesis and test it to predict if there is a relationship between certain object in Bob Ross's paintings.
+Would could find and evalute statistics for our models and graphs such as mean and standard deviation. We used bootstrapping in this assignment but we could also conduct a hypothesis test and use it to predict if there is a relationship between certain object in Bob Ross's paintings. Furthermore, we need to do more introductory analysis to determine which variables we should use because some combinations do not provide good data to analyze. 
