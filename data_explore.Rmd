@@ -31,17 +31,18 @@ ggplot(data = bob_ross) +
 The vast majority of Bob Ross's painting have trees in them 
 
 ```{r}
-ggplot(data=bob_ross) +
-  geom_bar(mapping = aes(x=tree, fill=factor(lake))) 
-
+ggplot(data = bob_ross) +
+    geom_histogram(aes(x = lake), fill = "lightblue", color= "white", bins = 30)
 ```
+Only a small number of Bob Ross's painting contain a beach 
 
 
 ```{r}
-ggplot(data = bob_ross) +
-    geom_histogram(aes(x = beach), fill = "lightblue", color= "white", bins = 30)
+ggplot(data=bob_ross) +
+  geom_bar(mapping = aes(x=tree, fill=factor(lake))) 
 ```
-Only a small number of Bob Ross's painting contain a beach 
+
+
 
 ```{r}
 ggplot(bob_ross)+
