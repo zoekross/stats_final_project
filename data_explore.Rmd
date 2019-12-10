@@ -76,21 +76,6 @@ tidy(glm_cloud) %>%
 We chose to produce this model because we wanted to see if adding an extra independent variable is going to change the relationship between lake and tree. By adding the additional independent variable, the odds for the lake coefficient increase to 28.21, on average. The presence of clouds in a painting increases the odds of a tree being present in the painting by 0.20, on average.  
 
 ```{r}
-set.seed(11)
-
-bootstrap_bob_ross <- 
-  rep_sample_n(bob_ross, 
-               size = 403,
-               reps = 200,  
-               replace = TRUE)%>% 
-  group_by(replicate) %>%
-  do(glm(tree ~ lake + clouds, data=.) %>% tidy()) %>% 
-  mutate(exp_est = exp(estimate)) %>%
-   select(term == "exp_estimate") %>% 
-  ungroup()
-
-```
-```{r}
 set.seed(111)
 boot_ross <-
   bob_ross %>% 
@@ -99,20 +84,18 @@ boot_ross <-
   do(glm(tree ~ lake, data=.) %>% tidy()) %>%
   filter(term == "lake")
 
-```
-
-```{r}
-
 boot_ross %>% 
-  ggplot(aes(x = estimate)) +
-  geom_histogram(bins=20)
+  ggplot() +
+  geom_histogram(aes(x=estimate))
 
-
-bootstrap_bob_ross %>%
+boot_ross %>%
   summarize(mean_est = mean(estimate),
             se_est = sd(estimate))
 ```
+
 This is a histogram showing the bootstrap distribution of the average likelihood that a lake is in the painting. The mean is 16.9% and SD is 19.8%.
+
+
 
 ```{r}
 estimated_coeff <- tidy(glm_tree)%>%
