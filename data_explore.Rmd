@@ -26,7 +26,7 @@ bob_ross <- bob_ross
 
 ```{r}
 ggplot(data = bob_ross) +
-    geom_histogram(aes(x = tree), fill = "lightblue", color= "white", bins = 30)
+    geom_histogram(aes(x = tree), fill = "lightblue", color= "white", bins = 10)
 ```
 The vast majority of Bob Ross's painting have trees in them 
 
@@ -46,8 +46,8 @@ ggplot(data=bob_ross) +
 
 ```{r}
 ggplot(bob_ross)+
-  geom_jitter(aes(x=season, y= factor(lake), color= factor(clouds)))+
-  facet_wrap(~lake)
+  geom_jitter(aes(x=season, y= factor(tree), color= factor(lake)))+
+  facet_wrap(~tree)
 ```
 
 ```{r}
