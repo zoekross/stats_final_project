@@ -32,12 +32,12 @@ The vast majority of Bob Ross's painting have trees in them
 
 ```{r}
 ggplot(data = bob_ross) +
-    geom_histogram(aes(x = lake), fill = "lightblue", color= "white", bins = 10)
+    geom_histogram(aes(x = beach), fill = "lightblue", color= "white", bins = 10)
 ```
 
 ```{r}
 ggplot(data = bob_ross) +
-    geom_histogram(aes(x = snow), fill = "lightblue", color= "white", bins = 10)
+    geom_histogram(aes(x = clouds), fill = "lightblue", color= "white", bins = 10)
 ```
 
 
@@ -48,9 +48,21 @@ ggplot(bob_ross)+
 ```
 If there is a lake in one of his paintings it is very likely that there will also be a tree because There is only one of his paintings that has a lake and no trees. 
 ```{r}
+ggplot(bob_ross)+
+  geom_jitter(aes(x=season, y= factor(tree), color= factor(clouds)))+
+  facet_wrap(~tree)
+```
+
+
+```{r}
 ggplot(data=bob_ross) +
   geom_bar(mapping = aes(x=tree, fill=factor(lake)), position = "fill")
 ```
+```{r}
+ggplot(data=bob_ross) +
+  geom_bar(mapping = aes(x=tree, fill=factor(clouds)), position = "fill")
+```
+
 
 
 ```{r}
