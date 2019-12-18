@@ -35,7 +35,7 @@ ggplot(data = bob_ross) +
     geom_bar(aes(x = tree), fill = "lightblue", color= "white")
 ```
 
-The vast majority of Bob Ross's painting have trees in them.
+The vast majority of Bob Ross's paintings have trees in them.
 
 
 ```{r echo=FALSE}
@@ -43,14 +43,14 @@ ggplot(data = bob_ross) +
     geom_bar(aes(x = flowers), fill = "lightblue", color= "white")
 ```
 
-The vast majority of Bob Ross's painting do NOT have flowers in them.
+The vast majority of Bob Ross's paintings do NOT have flowers in them.
 
 ```{r echo=FALSE}
 ggplot(data=bob_ross) +
   geom_bar(mapping = aes(x=flowers, fill=factor(tree)), position = "fill")
 ```
 
-Only about 20% of the painting that have flowers have have trees.
+Only about 20% of the paintings that have flowers have have trees.
 
 ```{r echo=FALSE}
 ggplot(data = bob_ross) +
@@ -65,7 +65,7 @@ ggplot(data=bob_ross) +
   geom_bar(mapping = aes(x=clouds, fill=factor(tree)), position = "fill")
 ```
 
-About 75% of the painting that have clouds have trees.
+About 75% of the paintings that have clouds have trees.
 
 
 ```{r echo=FALSE}
@@ -95,7 +95,7 @@ tidy(glm_flower)%>%
   mutate(exp_est = exp(estimate))
 ```
 
-On average, the presence of flowers in a painting increases the odds of having a tree in the painting .596. This makes sense and is in accordance with what we expected from the graph above. We chose to fit this model because our graph of tree and clouds didn't have a particularly good relationship and we wanted to make sure that was the case.
+On average, the presence of flowers in a painting increases the odds of having a tree in the painting .596. 
 
 ```{r echo=FALSE}
 tidy(glm_flower)%>%
@@ -134,7 +134,7 @@ tidy(glm_rock)%>%
   mutate(exp_est = exp(estimate))
 ```
 
-On average, the presence of rocks in a painting increases the odds of having a tree in the painting by 0.293. This makes sense and is in accordance with what we expected from the graph above. Again, we chose to fit this model because our graph of tree and rocks had an good relationship that we can investigate further.
+On average, the presence of rocks in a painting increases the odds of having a tree in the painting by 0.293. Again, we chose to fit this model because our graph of tree and rocks had an good relationship that we can investigate further.
 
 
 ```{r echo=FALSE}
@@ -163,9 +163,6 @@ tidy(glm_rock_cloud)%>%
          upperCI = estimate + 2*std.error)%>%
   select(term,upperCI,lowerCI,p.value)
 ```
-
-
-We chose to fit this model because we wanted to see what is the effect of combining the flowers and clouds variables. By adding the additional independent variable, the odds for the clouds coefficient increase to 0.233, on average. The presence of rocks in a painting increases the odds of a tree being present in the painting by 0.33, on average.  
 
 
 ### Hypothesis Testing
