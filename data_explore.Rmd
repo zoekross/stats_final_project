@@ -12,25 +12,25 @@ library(ggridges)
 library(tidyverse)
 library(broom)
 library(moderndive)
+library(ggmosaic)
 ```
 
 Describing Data and Research Question:
 
-Our data is an analysis of Bob Ross's paintings that show when certain elements of nature such as trees or waves appear in his work. This dataset comes from the fivethirtyeight package in R studio and it was collected by counting the number of certain objects in 403 of his paintings. We hope to learn more about how specific elements in his paintings influence the likelihood that a tree will appear in that same artwork.
+Our data is an analysis of Bob Ross's paintings that show when certain elements of nature such as trees or rocks appear in his work. This data set comes from the fivethirtyeight package in R studio and it was collected by counting the number of certain objects in 403 of his paintings. We hope to learn more about how specific elements in his paintings influence the likelihood that a tree will appear in that same piece of artwork.
 
-Question: We will work to examine how the frequencies of specific variables in his paintings affect the likelihood of trees appearing in his works. 
+Question: We will work to examine how the frequencies of specific variables (clouds, rocks, and flowers) in his paintings affect the likelihood of trees appearing in his works. 
 
 ```{r echo=FALSE}
 bob_ross <- bob_ross
 ```
 
 
-
 ### Graphs
 
 ```{r echo=FALSE}
 ggplot(data = bob_ross) +
-    geom_histogram(aes(x = tree), fill = "lightblue", color= "white", bins = 10)
+    geom_bar(aes(x = tree), fill = "lightblue", color= "white", bins = 10)
 ```
 
 The vast majority of Bob Ross's painting have trees in them.
@@ -38,20 +38,24 @@ The vast majority of Bob Ross's painting have trees in them.
 
 ```{r echo=FALSE}
 ggplot(data = bob_ross) +
-    geom_histogram(aes(x = clouds), fill = "lightblue", color= "white", bins = 10)
+    geom_bar(aes(x = flowers), fill = "lightblue", color= "white", bins = 10)
 ```
 
-Approximately half of his paintings have clouds in them and half of them do not.
+The vast majority of Bob Ross's painting do NOT have flowers in them.
 
+```{r echo=FALSE}
+ggplot(data=bob_ross) +
+  geom_bar(mapping = aes(x=flowers, fill=factor(tree)), position = "fill")
+```
 
+Only about 20% of the painting that have flowers have have trees.
 
 ```{r echo=FALSE}
 ggplot(data = bob_ross) +
-    geom_histogram(aes(x = rocks), fill = "lightblue", color= "white", bins = 10)
+    geom_bar(aes(x = clouds), fill = "lightblue", color= "white", bins = 10)
 ```
 
-Most of his painting do not have rocks in them, but there are about 75 that do.
-
+Approximately half of his paintings have clouds in them and half of them do not.
 
 
 ```{r echo=FALSE}
@@ -59,7 +63,15 @@ ggplot(data=bob_ross) +
   geom_bar(mapping = aes(x=clouds, fill=factor(tree)), position = "fill")
 ```
 
-About 75% of the painting that have clouds do not have trees.
+About 75% of the painting that have clouds have trees.
+
+
+```{r echo=FALSE}
+ggplot(data = bob_ross) +
+    geom_bar(aes(x = rocks), fill = "lightblue", color= "white", bins = 10)
+```
+
+Most of his paintings do not have rocks in them, but there are about 75 that do.
 
 
 ```{r echo=FALSE}
@@ -67,7 +79,30 @@ ggplot(data=bob_ross) +
   geom_bar(mapping = aes(x=rocks, fill=factor(tree)), position = "fill")
 ```
 
+About 75% of the paintings that have rocks do not have trees.
+
+
 ### Models
+
+
+```{r echo=FALSE}
+glm_flower <- glm(tree ~ flowers ,
+                  data= bob_ross, family=binomial)
+tidy(glm_flower)%>% 
+  select(term, estimate) %>% 
+  mutate(exp_est = exp(estimate))
+```
+
+On average, the presence of flowers in a painting increases the odds of having a tree in the painting .596. This makes sense and is in accordance with what we expected from the graph above. We chose to fit this model because our graph of tree and clouds didn't have a particularly good relationship and we wanted to make sure that was the case.
+
+```{r echo=FALSE}
+tidy(glm_flower)%>%
+  mutate(lowerCI = estimate - 2*std.error,
+         upperCI = estimate + 2*std.error)%>%
+  select(term,upperCI,lowerCI,p.value)
+```
+
+The p value is greater than .05 there we can accept the null hypothesis and determine that there is no relationship between flowers and tree.
 
 ```{r echo=FALSE}
 glm_cloud <- glm(tree ~ clouds,
@@ -83,17 +118,35 @@ On average, the presence of clouds in a painting increases the odds of having a 
 ```{r echo=FALSE}
 tidy(glm_cloud)%>%
   mutate(lowerCI = estimate - 2*std.error,
-         upperCI = estimate + 2*std.error)
-      
+         upperCI = estimate + 2*std.error)%>%
+   select(term,upperCI,lowerCI,p.value)
 ```
 
 The confindence interval for _______. 
 
+```{r echo=FALSE}
+glm_rock <- glm(tree ~ rocks,
+                  data= bob_ross, family=binomial)
+tidy(glm_rock)%>% 
+  select(term, estimate) %>% 
+  mutate(exp_est = exp(estimate))
+```
+
+On average, the presence of rocks in a painting increases the odds of having a tree in the painting by 0.293. This makes sense and is in accordance with what we expected from the graph above. Again, we chose to fit this model because our graph of tree and rocks had an good relationship that we can investigate further.
+
 
 ```{r echo=FALSE}
-glm_rocks <- glm(tree ~ rocks+clouds,
+tidy(glm_rock)%>%
+  mutate(lowerCI = estimate - 2*std.error,
+         upperCI = estimate + 2*std.error)%>%
+  select(term,upperCI,lowerCI,p.value)
+```
+
+
+```{r echo=FALSE}
+glm_rock_cloud <- glm(tree ~ rocks+clouds,
                   data= bob_ross, family=binomial)
-tidy(glm_rocks)%>% 
+tidy(glm_rock_cloud)%>% 
   select(term, estimate) %>% 
   mutate(exp_est = exp(estimate))
 ```
@@ -102,22 +155,34 @@ We chose to produce this model because we wanted to see if adding an extra indep
 
 
 ```{r echo=FALSE}
-tidy(glm_rocks)%>%
+tidy(glm_rock_cloud)%>%
   mutate(lowerCI = estimate - 2*std.error,
-         upperCI = estimate + 2*std.error)
-      
+         upperCI = estimate + 2*std.error)%>%
+  select(term,upperCI,lowerCI,p.value)
 ```
+
+
+We chose to fit this model because we wanted to see what is the effect of combining the beach and clouds variables. By adding the additional independent variable, the odds for the clouds coefficient increase to 0.233, on average. The presence of rocks in a painting increases the odds of a tree being present in the painting by 0.33, on average.  
 
 
 ### Hypothesis Testing
 
-H0: There is no relationship between tree and clouds (Beta 1 = 0).
-Ha: There is a relationship between tree and clouds (Beta 1 does not equal 0)
+H0: There is no relationship between tree and flowers (Beta 1 = 0).
+Ha: There is a relationship between tree and flowers (Beta 1 does not equal 0)
 
 
 ```{r echo=FALSE}
+tidy(glm_flower)%>%
+  select(term, p.value)
+```
+
+
+H0: There is no relationship between tree and clouds (Beta 1 = 0).
+Ha: There is a relationship between tree and clouds (Beta 1 does not equal 0)
+
+```{r echo=FALSE}
 set.seed(111)
-shuffle_ross <-
+shuffle_cloud <-
   bob_ross %>% 
   rep_sample_n(size = 403, replace = FALSE, reps = 200) %>% 
   group_by(replicate) %>% 
@@ -125,19 +190,34 @@ shuffle_ross <-
   do(glm(tree ~ new_clouds, data=., family=binomial(link = "logit")) %>% tidy()) %>%
   filter(term == "new_clouds")
 
-shuffle_ross %>% 
+shuffle_cloud %>% 
   ggplot() +
   geom_histogram(aes(x=estimate), bins = 20)
 ```
 
 ```{r echo=FALSE}
-shuffle_ross%>%
+shuffle_cloud%>%
   ungroup()%>%
   mutate(extreme = estimate > 95) %>% 
   summarize(p_value = 2*mean(extreme))
 ```
 
 The p-value of 0 means that if the true coefficient of the clouds was 0, the chances we'd see an estimated coefficient of -1.455180	or something more extreme is 0. So it's unlikely to observe something like we observed in our data when the null hypothesis is true. Thus, we have evidence to reject the null hypothesis, i.e. there is evidence that there is a relationship between the presence of clouds in the painting and the presence of a tree on the same painting. 
+
+
+H0: There is no relationship between tree and rocks (Beta 1 = 0).
+Ha: There is a relationship between tree and rocks (Beta 1 does not equal 0)
+
+```{r echo=FALSE}
+tidy(glm_rock)%>%
+  select(term, p.value)
+```
+
+The p-value is less the 0.05 therefore we can reject the null hypothesis, meaning there is a relationship between trees, and rocks.
+
+
+H0: There is no relationship between tree and rocks, accounted for clouds (Beta 1 = 0).
+Ha: There is a relationship between tree and rocks, accounted for clouds (Beta 1 does not equal 0)
 
 
 ```{r echo=FALSE}
@@ -163,9 +243,8 @@ shuffle_rocks%>%
   summarize(p_value = 2*mean(extreme))
 ```
 
-The p-value is less the 0.05 therefore we can reject the null hypothesis, meaning there is a relationship between trees, and rocks.
+The p-value is less the 0.05 therefore we can reject the null hypothesis, meaning there is a relationship between trees and rocks, accounted for clouds. 
 
 
-Next research steps: 
 
-Would could find and evalute statistics for our models and graphs such as mean and standard deviation. We used bootstrapping in this assignment but we could also conduct a hypothesis test and use it to predict if there is a relationship between certain object in Bob Ross's paintings. Furthermore, we need to do more introductory analysis to determine which variables we should use because some combinations do not provide good data to analyze. 
+
