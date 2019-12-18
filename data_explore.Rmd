@@ -21,6 +21,8 @@ Our data is an analysis of Bob Ross's paintings that show when certain elements 
 
 Question: We will work to examine how the frequencies of specific variables (clouds, rocks, and flowers) in his paintings affect the likelihood of trees appearing in his works. 
 
+![Bob Ross](https://40cupx20bt643wowwz361l9h-wpengine.netdna-ssl.com/wp-content/uploads/2019/07/bob-ross.jpg)
+
 ```{r echo=FALSE}
 bob_ross <- bob_ross
 ```
@@ -30,7 +32,7 @@ bob_ross <- bob_ross
 
 ```{r echo=FALSE}
 ggplot(data = bob_ross) +
-    geom_bar(aes(x = tree), fill = "lightblue", color= "white", bins = 10)
+    geom_bar(aes(x = tree), fill = "lightblue", color= "white")
 ```
 
 The vast majority of Bob Ross's painting have trees in them.
@@ -38,7 +40,7 @@ The vast majority of Bob Ross's painting have trees in them.
 
 ```{r echo=FALSE}
 ggplot(data = bob_ross) +
-    geom_bar(aes(x = flowers), fill = "lightblue", color= "white", bins = 10)
+    geom_bar(aes(x = flowers), fill = "lightblue", color= "white")
 ```
 
 The vast majority of Bob Ross's painting do NOT have flowers in them.
@@ -52,7 +54,7 @@ Only about 20% of the painting that have flowers have have trees.
 
 ```{r echo=FALSE}
 ggplot(data = bob_ross) +
-    geom_bar(aes(x = clouds), fill = "lightblue", color= "white", bins = 10)
+    geom_bar(aes(x = clouds), fill = "lightblue", color= "white")
 ```
 
 Approximately half of his paintings have clouds in them and half of them do not.
@@ -68,7 +70,7 @@ About 75% of the painting that have clouds have trees.
 
 ```{r echo=FALSE}
 ggplot(data = bob_ross) +
-    geom_bar(aes(x = rocks), fill = "lightblue", color= "white", bins = 10)
+    geom_bar(aes(x = rocks), fill = "lightblue", color= "white")
 ```
 
 Most of his paintings do not have rocks in them, but there are about 75 that do.
@@ -102,7 +104,7 @@ tidy(glm_flower)%>%
   select(term,upperCI,lowerCI,p.value)
 ```
 
-The p value is greater than .05 there we can accept the null hypothesis and determine that there is no relationship between flowers and tree.
+
 
 ```{r echo=FALSE}
 glm_cloud <- glm(tree ~ clouds,
@@ -121,8 +123,8 @@ tidy(glm_cloud)%>%
          upperCI = estimate + 2*std.error)%>%
    select(term,upperCI,lowerCI,p.value)
 ```
+![A Painting with a Trees and Clouds](https://i.redd.it/9yp43iybk2zx.jpg)
 
-The confindence interval for _______. 
 
 ```{r echo=FALSE}
 glm_rock <- glm(tree ~ rocks,
@@ -141,6 +143,7 @@ tidy(glm_rock)%>%
          upperCI = estimate + 2*std.error)%>%
   select(term,upperCI,lowerCI,p.value)
 ```
+
 
 
 ```{r echo=FALSE}
@@ -162,7 +165,7 @@ tidy(glm_rock_cloud)%>%
 ```
 
 
-We chose to fit this model because we wanted to see what is the effect of combining the beach and clouds variables. By adding the additional independent variable, the odds for the clouds coefficient increase to 0.233, on average. The presence of rocks in a painting increases the odds of a tree being present in the painting by 0.33, on average.  
+We chose to fit this model because we wanted to see what is the effect of combining the flowers and clouds variables. By adding the additional independent variable, the odds for the clouds coefficient increase to 0.233, on average. The presence of rocks in a painting increases the odds of a tree being present in the painting by 0.33, on average.  
 
 
 ### Hypothesis Testing
@@ -175,6 +178,8 @@ Ha: There is a relationship between tree and flowers (Beta 1 does not equal 0)
 tidy(glm_flower)%>%
   select(term, p.value)
 ```
+
+The p value is greater than .05 there we cannot reject the null hypothesis and determine that there is no relationship between flowers and tree.
 
 
 H0: There is no relationship between tree and clouds (Beta 1 = 0).
@@ -243,8 +248,12 @@ shuffle_rocks%>%
   summarize(p_value = 2*mean(extreme))
 ```
 
-The p-value is less the 0.05 therefore we can reject the null hypothesis, meaning there is a relationship between trees and rocks, accounted for clouds. 
+The p-value is less the 0.05 therefore we can reject the null hypothesis, meaning there is a relationship between trees and rocks, while accounting for clouds. 
 
+![Painting with Trees, Clouds, and Rocks](https://almightyeasel.files.wordpress.com/2015/03/mt-mckinley-bob-ross-s1ep2.png)
 
+### Summary
 
+Based off of our research, it was found that there are certain objects that influence the likelihood of a tree appearing in Bob Ross's paintings. It is more likely that there will be relationship between tree and the object if the object is in many paintings. It was found that clouds and rocks influence the presence of a tree in a painting compared to having flowers in the painting, which shows there is no relationship. 
 
+Some challenges we faced with our dataset was that some variables only appeared in a small number of his paintings which interfered with the results. Also if there were only a few paintings with both a tree and the specific object we were analyzing, our exponentiated estimate and other statistic were very insigfiicant because some samples were taken without those observations being drawn. 
