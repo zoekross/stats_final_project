@@ -81,7 +81,7 @@ ggplot(data=bob_ross) +
   geom_bar(mapping = aes(x=rocks, fill=factor(tree)), position = "fill")
 ```
 
-About 75% of the paintings that have rocks do not have trees.
+About 75% of the paintings that have rocks have trees.
 
 
 ### Models
